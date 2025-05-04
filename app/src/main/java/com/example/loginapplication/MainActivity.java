@@ -6,25 +6,29 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.example.loginapplication.owon.sdk.util.SocketMessageListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.example.loginapplication.owon.sdk.util.SocketMessageListener;
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
+
+    // Default credentials
+    private static final String DEFAULT_USERNAME = "fbadmin";
+    private static final String DEFAULT_PASSWORD = "fbadmin";
 
     private EditText etUsername;
     private EditText etPassword;
     private Button btnLogin;
     private TextView receiveMessage;
+    private ProgressBar progressBar;
 
-    // 默认账号密码
-    private static final String DEFAULT_USERNAME = "fbadmin";
-    private static final String DEFAULT_PASSWORD = "fbadmin";
+    private LoginManager loginManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,14 +40,14 @@ public class MainActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         receiveMessage = findViewById(R.id.receive_message);
+        progressBar = findViewById(R.id.progressBar);
+        loginManager = new LoginManager(this);
 
-        btnLogin.setText("Login");
+        // Set default values for username and password
+        etUsername.setText(DEFAULT_USERNAME);
 
-        // Set username hint instead of text
+        // Set default text fields
         etUsername.setHint("Please Enter your Username......");
-        etUsername.setText("");
-
-        // Set password hint
         etPassword.setHint("Please Enter your Password");
 
         // Set click listener for login button
@@ -53,7 +57,17 @@ public class MainActivity extends AppCompatActivity {
                 String username = etUsername.getText().toString().trim();
                 String password = etPassword.getText().toString().trim();
 
-                // Perform login
+                // Validate input
+                if (username.isEmpty() || password.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Please enter both username and password", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Show progress
+                progressBar.setVisibility(View.VISIBLE);
+                receiveMessage.setText("Connecting...");
+
+                // Perform login with callback pattern
                 performLogin(username, password);
             }
         });
@@ -62,11 +76,8 @@ public class MainActivity extends AppCompatActivity {
     private void performLogin(String username, String password) {
         Log.d(TAG, "Attempting login with username: " + username);
 
-        // Create a login socket handler instance
-        LoginSocketHandler loginHandler = new LoginSocketHandler(this);
-
-        // Call login method and handle the response through callback
-        loginHandler.loginSocket(username, password, new SocketMessageListener() {
+        // Call login method with a callback to handle the response
+        loginManager.loginSocket(username, password, new SocketMessageListener() {
             @Override
             public void getMessage(int commandID, Object bean) {
                 // Process login response
@@ -76,6 +87,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void processLoginResponse(int commandID, Object bean) {
+        progressBar.setVisibility(View.GONE);
+
         if (bean instanceof LoginSocketResBean) {
             LoginSocketResBean loginRes = (LoginSocketResBean) bean;
             int code = loginRes.getCode();
@@ -91,19 +104,14 @@ public class MainActivity extends AppCompatActivity {
                 String jsonString = jsonResponse.toString();
                 Log.d(TAG, "Login Response: " + jsonString);
 
-                // Update UI on main thread
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        receiveMessage.setText(getLoginStatusMessage(code));
+                // Update UI
+                receiveMessage.setText(getLoginStatusMessage(code));
 
-                        if (code == 100) {
-                            Toast.makeText(MainActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(MainActivity.this, "Login Failed: " + getLoginStatusMessage(code), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+                if (code == 100) {
+                    Toast.makeText(MainActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "Login Failed: " + getLoginStatusMessage(code), Toast.LENGTH_SHORT).show();
+                }
 
             } catch (JSONException e) {
                 Log.e(TAG, "JSON Error: " + e.getMessage());
@@ -114,19 +122,28 @@ public class MainActivity extends AppCompatActivity {
     private String getLoginStatusMessage(int code) {
         switch (code) {
             case 100:
-                return "Login successful";
+                return "登录成功";
             case 110:
-                return "Login failed";
+                return "登录失败";
             case 301:
-                return "Account does not exist";
+                return "账号不存在";
             case 302:
-                return "Password error limit reached, account locked for 5 minutes";
+                return "密码错误次数达到上限，账号被锁定5分钟";
             case 303:
-                return "Password error";
+                return "密码错误";
             case 304:
-                return "Account locked";
-            default:
-                return "Unknown error";
+                return "账号被锁定";
+            default://This can be delete
+                return "未知错误";
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Close the Netty connection when the activity is destroyed
+        if (loginManager != null) {
+            loginManager.closeConnection();
         }
     }
 }
