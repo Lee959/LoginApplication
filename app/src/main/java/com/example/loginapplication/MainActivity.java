@@ -18,16 +18,11 @@ import com.example.loginapplication.owon.sdk.util.SocketMessageListener;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
-    // Default credentials
-    private static final String DEFAULT_USERNAME = "fbadmin";
-    private static final String DEFAULT_PASSWORD = "fbadmin";
-
     private EditText etUsername;
     private EditText etPassword;
     private Button btnLogin;
     private TextView receiveMessage;
     private ProgressBar progressBar;
-
     private LoginManager loginManager;
 
     @Override
@@ -43,14 +38,6 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         loginManager = new LoginManager(this);
 
-        // Set default values for username and password
-        etUsername.setText(DEFAULT_USERNAME);
-
-        // Set default text fields
-        etUsername.setHint("Please Enter your Username......");
-        etPassword.setHint("Please Enter your Password");
-
-        // Set click listener for login button
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -63,11 +50,9 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                // Show progress
                 progressBar.setVisibility(View.VISIBLE);
                 receiveMessage.setText("Connecting...");
 
-                // Perform login with callback pattern
                 performLogin(username, password);
             }
         });
@@ -76,11 +61,9 @@ public class MainActivity extends AppCompatActivity {
     private void performLogin(String username, String password) {
         Log.d(TAG, "Attempting login with username: " + username);
 
-        // Call login method with a callback to handle the response
         loginManager.loginSocket(username, password, new SocketMessageListener() {
             @Override
             public void getMessage(int commandID, Object bean) {
-                // Process login response
                 processLoginResponse(commandID, bean);
             }
         });
@@ -93,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
             LoginSocketResBean loginRes = (LoginSocketResBean) bean;
             int code = loginRes.getCode();
 
-            // Create JSON response for logging
             JSONObject jsonResponse = new JSONObject();
             try {
                 jsonResponse.put("commandID", commandID);

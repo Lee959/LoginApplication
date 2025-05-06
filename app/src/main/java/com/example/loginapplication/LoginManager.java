@@ -15,7 +15,7 @@ import com.example.loginapplication.owon.sdk.util.SocketMessageListener;
 public class LoginManager {
     private static final String TAG = "LoginManager";
 
-    // Default credentials
+    // 默认账号密码
     private static final String DEFAULT_USERNAME = "fbadmin";
     private static final String DEFAULT_PASSWORD = "fbadmin";
 
@@ -96,7 +96,6 @@ public class LoginManager {
     public void loginSocket(String account, String password, final SocketMessageListener listener) {
         Log.d(TAG, "Login attempt with account: " + account);
 
-        // Perform the login in a background thread
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -111,24 +110,22 @@ public class LoginManager {
 
                 // Check if account exists
                 if (!DEFAULT_USERNAME.equals(account)) {
-                    loginResBean.setCode(301); // Account doesn't exist
+                    loginResBean.setCode(301);
                     Log.d(TAG, "Account doesn't exist (301)");
                 }
                 // Check if account is locked
                 else if (getAccountLockTimeRemaining(account) > 0) {
-                    loginResBean.setCode(304); // Account locked
+                    loginResBean.setCode(304);
                     Log.d(TAG, "Account is locked (304)");
                 }
                 // Validate credentials
                 else if (DEFAULT_USERNAME.equals(account) && DEFAULT_PASSWORD.equals(password)) {
                     loginResBean.setCode(100); // Login success
                     Log.d(TAG, "Login successful (100)");
-                    // Reset login attempts on successful login
                     resetLoginAttempts(account);
                 }
                 // Password error
                 else {
-                    // Increment login attempts
                     boolean isNowLocked = incrementLoginAttempts(account);
 
                     if (isNowLocked) {
@@ -140,7 +137,6 @@ public class LoginManager {
                     }
                 }
 
-                // Post callback to main thread
                 mainHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -163,12 +159,10 @@ public class LoginManager {
      * These are no-ops in this simplified implementation
      */
     public void initConnection() {
-        // No-op in this simplified implementation
         Log.d(TAG, "Connection initialized");
     }
 
     public void closeConnection() {
-        // No-op in this simplified implementation
         Log.d(TAG, "Connection closed");
     }
 }

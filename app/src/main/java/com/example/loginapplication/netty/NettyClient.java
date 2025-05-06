@@ -27,8 +27,8 @@ import org.json.JSONObject;
 public class NettyClient {
     private static final String TAG = "NettyClient";
 
-    private static final String HOST = "example.server.com"; // Replace with your server address
-    private static final int PORT = 8080; // Replace with your server port
+    private static final String HOST = "example.server.com";
+    private static final int PORT = 8080;
 
     private EventLoopGroup group;
     private Channel channel;
