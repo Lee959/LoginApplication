@@ -46,12 +46,12 @@ public class MainActivity extends AppCompatActivity {
 
                 // Validate input
                 if (username.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(MainActivity.this, "Please enter both username and password", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "请输入用户名和密码", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 progressBar.setVisibility(View.VISIBLE);
-                receiveMessage.setText("Connecting...");
+                receiveMessage.setText("正在连接...");
 
                 performLogin(username, password);
             }
@@ -90,9 +90,9 @@ public class MainActivity extends AppCompatActivity {
                 receiveMessage.setText(getLoginStatusMessage(code));
 
                 if (code == 100) {
-                    Toast.makeText(MainActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(MainActivity.this, "Login Failed: " + getLoginStatusMessage(code), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "登陆失败: " + getLoginStatusMessage(code), Toast.LENGTH_SHORT).show();
                 }
 
             } catch (JSONException e) {

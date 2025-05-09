@@ -22,7 +22,7 @@
             android:textStyle="bold"
             android:layout_marginTop="32dp"
             android:layout_marginBottom="32dp"/>
-<!--        hi-->
+
 
         <EditText
             android:id="@+id/etUsername"
@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textPersonName"
-            android:hint="Please Enter your Username......"
+            android:hint="请输入用户名"
             android:layout_marginBottom="16dp"
             android:padding="12dp"
             android:background="@android:drawable/editbox_background" />
@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textPassword"
-            android:hint="Please Enter your Password"
+            android:hint="请输入密码"
             android:layout_marginBottom="24dp"
             android:padding="12dp"
             android:background="@android:drawable/editbox_background" />
@@ -50,7 +50,7 @@
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Login"
+            android:text="登录"
             android:textSize="16sp"
             android:padding="12dp" />
 

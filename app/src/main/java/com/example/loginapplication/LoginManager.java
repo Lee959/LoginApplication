@@ -75,7 +75,7 @@ public class LoginManager {
             // Lock the account for 5 minutes
             long lockEndTime = System.currentTimeMillis() + LOCK_DURATION_MS;
             accountLockTime.put(account, lockEndTime);
-            Log.d(TAG, "Account " + account + " locked for 5 minutes due to too many failed attempts");
+            Log.d(TAG, "账户 " + account + " 由于尝试失败次数过多，账户将被锁定 5 分钟”");
             return true;
         }
         return false;
@@ -94,7 +94,7 @@ public class LoginManager {
      * Uses the callback pattern to handle the asynchronous response
      */
     public void loginSocket(String account, String password, final SocketMessageListener listener) {
-        Log.d(TAG, "Login attempt with account: " + account);
+        Log.d(TAG, "使用以下帐户登录尝试：: " + account);
 
         new Thread(new Runnable() {
             @Override
@@ -111,17 +111,17 @@ public class LoginManager {
                 // Check if account exists
                 if (!DEFAULT_USERNAME.equals(account)) {
                     loginResBean.setCode(301);
-                    Log.d(TAG, "Account doesn't exist (301)");
+                    Log.d(TAG, "账户不存在 (301)");
                 }
                 // Check if account is locked
                 else if (getAccountLockTimeRemaining(account) > 0) {
                     loginResBean.setCode(304);
-                    Log.d(TAG, "Account is locked (304)");
+                    Log.d(TAG, "账户已锁定 (304)");
                 }
                 // Validate credentials
                 else if (DEFAULT_USERNAME.equals(account) && DEFAULT_PASSWORD.equals(password)) {
                     loginResBean.setCode(100); // Login success
-                    Log.d(TAG, "Login successful (100)");
+                    Log.d(TAG, "登录成功 (100)");
                     resetLoginAttempts(account);
                 }
                 // Password error
@@ -130,10 +130,10 @@ public class LoginManager {
 
                     if (isNowLocked) {
                         loginResBean.setCode(302); // Password error limit reached
-                        Log.d(TAG, "Password error limit reached, account locked (302)");
+                        Log.d(TAG, "密码错误次数达到上限，账号被锁定5分钟 (302)");
                     } else {
                         loginResBean.setCode(303); // Password error
-                        Log.d(TAG, "Password error (303). Attempt " + loginAttempts.get(account) + " of " + MAX_PASSWORD_ATTEMPTS);
+                        Log.d(TAG, "密码错误 (303). Attempt " + loginAttempts.get(account) + " of " + MAX_PASSWORD_ATTEMPTS);
                     }
                 }
 
